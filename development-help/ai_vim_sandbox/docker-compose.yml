@@ -15,63 +15,6 @@ services:
     command: ["-c", "sleep infinity"]
     networks: [sandbox]
 
-  litellm:
-    image: ghcr.io/berriai/litellm:main-stable
-    container_name: litellm
-    platform: linux/amd64
-    entrypoint: ["litellm"]
-    command: ["--config", "/config/config.yaml", "--port", "4000"]
-    environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - LITELLM_LOG=DEBUG
-    volumes:
-      - ./persist/litellm:/config
-    networks: [sandbox]
-    ports:
-      - "4000:4000"
-    depends_on:
-        - ollama
-
-  openhands-cli:
-    image: python:3.12-slim
-    container_name: openhands-cli
-    networks: [sandbox]
-    depends_on:
-      - litellm
-    environment:
-
-      - AGENT_SERVER_IMAGE_REPOSITORY=ghcr.io/openhands/agent-server
-      - AGENT_SERVER_IMAGE_TAG=1.10.0-python
-      - SANDBOX_USER_ID=${C_UID}
-      - SANDBOX_VOLUMES=./persist/openhands-cli
-      - SANDBOX_TIMEOUT=${SANDBOX_TIMEOUT:-600}
-
-      # Point OpenHands at LiteLLM (OpenAI-compatible /v1 endpoint)
-      - LLM_API_KEY=litellm
-      - LLM_MODEL=litellm_proxy/qwen2_5-coder-7b
-      - LLM_BASE_URL=http://litellm:4000/v1
-
-      # Add logging
-      - LOG_TO_FILE=true
-      - LOG_DIR=/tmp
-      - DEBUG=true
-
-    volumes:
-      # Persist OpenHands state under persist/
-      - ./persist/openhands-state:/.openhands-state
-      - ./persist/openhands:/root/.openhands
-
-      # OpenHands uses Docker as its sandbox runtime (needs the socket)
-      - /var/run/docker.sock:/var/run/docker.sock
-
-      # Only mount your controlled workspace (no full host FS)
-      - ./persist/openhands-cli:/opt/openhands-cli
-
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    stdin_open: true
-    tty: true
-    command: ["sleep", "infinity"]
 
 networks:
   sandbox:
