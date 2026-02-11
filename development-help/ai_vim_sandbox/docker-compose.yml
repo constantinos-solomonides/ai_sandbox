@@ -23,6 +23,7 @@ services:
     command: ["--config", "/config/config.yaml", "--port", "4000"]
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LITELLM_LOG=DEBUG
     volumes:
       - ./persist/litellm:/config
     networks: [sandbox]
@@ -49,6 +50,11 @@ services:
       - LLM_API_KEY=litellm
       - LLM_MODEL=litellm_proxy/qwen2_5-coder-7b
       - LLM_BASE_URL=http://litellm:4000/v1
+
+      # Add logging
+      - LOG_TO_FILE=true
+      - LOG_DIR=/tmp
+      - DEBUG=true
 
     volumes:
       # Persist OpenHands state under persist/
