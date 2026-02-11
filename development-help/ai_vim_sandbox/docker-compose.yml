@@ -8,13 +8,22 @@ services:
     ports:
       - "11434:11434" # optional; remove if you only want internal access
 
+  ubuntu:
+    image: ubuntu:latest
+    container_name: ubuntu
+    entrypoint: ["/bin/bash"]
+    command: ["-c", "sleep infinity"]
+    networks: [sandbox]
+
   litellm:
     image: ghcr.io/berriai/litellm:main-stable
+    container_name: litellm
     platform: linux/amd64
     entrypoint: ["litellm"]
     command: ["--config", "/config/config.yaml", "--port", "4000"]
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - LITELLM_LOG=DEBUG
     volumes:
       - ./persist/litellm:/config
     networks: [sandbox]
@@ -23,89 +32,48 @@ services:
     depends_on:
         - ollama
 
-  openhands:
-    image: ghcr.io/all-hands-ai/openhands:0.28
-    container_name: openhands
+  openhands-cli:
+    image: python:3.12-slim
+    container_name: openhands-cli
     networks: [sandbox]
     depends_on:
       - litellm
-    ports:
-      - "3000:3000"
     environment:
-      # OpenHands is typically configured via env vars for runtime + LLM endpoint
-      - SANDBOX_RUNTIME_CONTAINER_IMAGE=ghcr.io/all-hands-ai/runtime:0.28-nikolaik
-      - LOG_ALL_EVENTS=true
+
+      - AGENT_SERVER_IMAGE_REPOSITORY=ghcr.io/openhands/agent-server
+      - AGENT_SERVER_IMAGE_TAG=1.10.0-python
+      - SANDBOX_USER_ID=${C_UID}
+      - SANDBOX_VOLUMES=./persist/openhands-cli
+      - SANDBOX_TIMEOUT=${SANDBOX_TIMEOUT:-600}
 
       # Point OpenHands at LiteLLM (OpenAI-compatible /v1 endpoint)
       - LLM_API_KEY=litellm
       - LLM_MODEL=litellm_proxy/qwen2_5-coder-7b
       - LLM_BASE_URL=http://litellm:4000/v1
 
-      # Bind mount path used by OpenHands (matches your sandboxed workspace)
-      - WORKSPACE_MOUNT_PATH=/opt/workspace_base
-      - SANDBOX_USER_ID=${C_UID}
+      # Add logging
+      - LOG_TO_FILE=true
+      - LOG_DIR=/tmp
+      - DEBUG=true
+
     volumes:
       # Persist OpenHands state under persist/
       - ./persist/openhands-state:/.openhands-state
+      - ./persist/openhands:/root/.openhands
 
       # OpenHands uses Docker as its sandbox runtime (needs the socket)
       - /var/run/docker.sock:/var/run/docker.sock
 
       # Only mount your controlled workspace (no full host FS)
-      - ./persist/workspace:/opt/workspace_base
+      - ./persist/openhands-cli:/opt/openhands-cli
 
     extra_hosts:
       - "host.docker.internal:host-gateway"
     stdin_open: true
     tty: true
-
-  openhands-cli:
-    build:
-      context: ./openhands-cli
-      dockerfile: Dockerfile
-    container_name: openhands-cli
-    working_dir: /workspace
-    networks: [sandbox]
-    depends_on:
-      - litellm
-    environment:
-      - HOME=/persist/openhands-cli
-
-      # LiteLLM OpenAI-compatible endpoint (internal Docker network)
-      - OPENAI_API_BASE=http://litellm:4000/v1
-      - OPENAI_API_KEY=litellm
-
-      # Pick a model id that LiteLLM exposes (recommended: openai/… alias)
-      - OPENAI_MODEL=litellm_proxy/qwen2_5-coder-7b
-    volumes:
-      - ./persist/workspace:/workspace
-      - ./persist/openhands-cli:/persist/openhands-cli
-    tty: true
-    stdin_open: true
-
-  vim:
-    build:
-      context: ./vim-sandbox
-      args:
-        C_UID: ${C_UID}
-        C_GID: ${C_GID}
-        USERNAME: ${USERNAME}
-    container_name: vim-sandbox
-    depends_on:
-      - ollama
-    tty: true
-    stdin_open: true
-    environment:
-      - USERNAME=${USERNAME}
-      - OLLAMA_BASE_URL=http://ollama:11434
-      - WORKDIR=/workspace
-    # Only mount explicitly allowed directories; no full-host filesystem exposure
-    volumes:
-      - ./persist/home:/home/${USERNAME}
-      - ./persist/workspace:/workspace
-      - ./persist/vim:/home/${USERNAME}/.vim
-    working_dir: /workspace
+    command: ["sleep", "infinity"]
 
 networks:
   sandbox:
     driver: bridge
+    name: ai-sandbox
