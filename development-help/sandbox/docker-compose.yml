@@ -1,22 +1,42 @@
 services:
   ollama:
     image: ollama/ollama:latest
-    container_name: ollama
-    networks: [sandbox]
+    container_name: opencode-ollama
     volumes:
-      - ./persist/ollama:/root/.ollama
-    ports:
-      - "11434:11434" # optional; remove if you only want internal access
+      - ./persist/ollama-models:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_PORT=11434
+      - OLLAMA_NUM_PARALLEL=2
+      - OLLAMA_MAX_LOADED_MODELS=1
+    deploy:
+      resources:
+        limits:
+          memory: 14G
+    networks:
+      - ai-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  ubuntu:
-    image: ubuntu:latest
-    container_name: ubuntu
-    entrypoint: ["/bin/bash"]
-    command: ["-c", "sleep infinity"]
-    networks: [sandbox]
-
+  opencode:
+    image: ghcr.io/anomalyco/opencode:latest
+    container_name: opencode-cli
+    volumes:
+      - ./persist/workspace:/workspace
+      - ./persist/opencode-config/opencode.json:/root/.config/opencode/opencode.json
+      - ./persist/opencode-config/opencode.json:/root/.config/opencode/opencode.jsonc
+    stdin_open: true
+    tty: true
+    working_dir: /workspace
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks:
+      - ai-network
 
 networks:
-  sandbox:
+  ai-network:
     driver: bridge
-    name: ai-sandbox
