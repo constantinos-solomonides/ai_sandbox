@@ -15,6 +15,12 @@ setup: configs ollama opencode
 opencode: pull-model
 	docker compose up -d opencode
 
+gemini-up:
+	docker compose up -d gemini
+
+gemini: gemini-up
+	docker exec -it gemini /bin/bash
+
 ollama:
 	docker compose up -d ollama
 	docker compose exec ollama /bin/bash -c 'apt-get update; apt-get install -y curl'

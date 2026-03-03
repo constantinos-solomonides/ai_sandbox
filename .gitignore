@@ -3,5 +3,5 @@ development-help/*/persist/*
 !development-help/*/persist/litellm
 development-help/*/persist/litellm/*
 !development-help/*/persist/litellm/config.yaml
-development-help/*/.env
+#development-help/*/.env
 **/.vagrant

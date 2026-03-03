@@ -5,7 +5,7 @@
 #   'sed    -e "s/<TELEPHONE_RE_PATTERN>/MY_PHONE_NUMB.ER/g" \
 #           -e "s/<EMAIL_RE_PATTERN>/MY_EMAIL_ADDRE.SS/g" \
 #           -e "s/<OPENAI_RE_PATTERN>/MY_OPENAI_K.EY/ \
-#           -e 's/\s\+$//'' # The last entry removes EOL whitespace
+#           -e "s/\s\+$//"' # The last entry removes EOL whitespace
 # git config --global filter.anonymize.smudge \
 #    'sed   -e "s/MY_PHONE_NUMB.ER/<ACTUAL_PHONE_NUMBER>/g" \
 #           -e "s/MY_EMAIL_ADDRE.SS/<ACTUAL_EMAIL>/g" \
@@ -14,5 +14,6 @@
 *.md        filter=anonymize
 *.sh        filter=anonymize
 *.yml       filter=anonymize
+.env        filter=anonymize
 Dockerfile  filter=anonymize
 .gitattributes filter=anonymize

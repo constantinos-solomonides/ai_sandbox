@@ -37,6 +37,19 @@ services:
     networks:
       - ai-network
 
+  gemini:
+    image: us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox:latest
+    container_name: gemini-cli
+    stdin_open: true
+    tty: true
+    volumes:
+      # Mounts your current project folder to /app inside the container
+      - .:/app
+      # Maps the local ./persist folder to the container's config directory
+      - ./persist:/root/.gemini
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    working_dir: /app
 networks:
   ai-network:
     driver: bridge
