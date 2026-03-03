@@ -19,7 +19,7 @@ gemini-up:
 	docker compose up -d gemini
 
 gemini: gemini-up
-	docker exec -it gemini /bin/bash
+	docker exec -it gemini-cli /bin/bash
 
 ollama:
 	docker compose up -d ollama

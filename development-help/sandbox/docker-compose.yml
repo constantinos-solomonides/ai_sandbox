@@ -38,7 +38,7 @@ services:
       - ai-network
 
   gemini:
-    image: us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox:latest
+    image: us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox@sha256:8c7c10efd6fa25026767f75e27682beb831bd4270d8a04b88234c868973d41f3
     container_name: gemini-cli
     stdin_open: true
     tty: true
@@ -47,8 +47,7 @@ services:
       - .:/app
       # Maps the local ./persist folder to the container's config directory
       - ./persist:/root/.gemini
-    environment:
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    env_file: .env
     working_dir: /app
 networks:
   ai-network:
