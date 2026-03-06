@@ -21,6 +21,9 @@ services:
       timeout: 10s
       retries: 3
 
+  # TODO
+  # Remove opencode
+  # Implement Ubuntu testbox
   opencode:
     image: ghcr.io/anomalyco/opencode:latest
     container_name: opencode-cli
@@ -49,6 +52,20 @@ services:
       - ./persist:/root/.gemini
     env_file: .env
     working_dir: /app
+
+  # TODO add in makefile
+  # Add `build` subsection with context to build a cursor image
+  testbox:
+    image: ubuntu:latest
+    container_name: testbox
+    volumes:
+      - ./persist/workspace:/workspace
+    stdin_open: true
+    tty: true
+    working_dir: /workspace
+    networks:
+      - ai-network
+
 networks:
   ai-network:
     driver: bridge

@@ -12,6 +12,8 @@ setup: configs ollama opencode
 	:
 
 
+testbox-setup:
+	docker compose
 opencode: pull-model
 	docker compose up -d opencode
 
@@ -19,7 +21,7 @@ gemini-up:
 	docker compose up -d gemini
 
 gemini: gemini-up
-	docker exec -it gemini-cli /bin/bash
+	docker compose exec -it gemini /bin/bash
 
 ollama:
 	docker compose up -d ollama
@@ -31,14 +33,8 @@ ollama:
 down:
 	docker compose down
 
-pull-model: 
-	docker exec opencode-ollama ollama pull qwen2.5:7b
-
 logs:
 	docker compose logs -f ollama
-
-exec: 
-	docker exec -it opencode-cli /bin/sh
 
 clean:
 	docker compose down -v
