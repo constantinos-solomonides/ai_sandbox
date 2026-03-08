@@ -1,45 +1,4 @@
 services:
-  ollama:
-    image: ollama/ollama:latest
-    container_name: opencode-ollama
-    volumes:
-      - ./persist/ollama-models:/root/.ollama
-    environment:
-      - OLLAMA_HOST=0.0.0.0
-      - OLLAMA_PORT=11434
-      - OLLAMA_NUM_PARALLEL=2
-      - OLLAMA_MAX_LOADED_MODELS=1
-    deploy:
-      resources:
-        limits:
-          memory: 14G
-    networks:
-      - ai-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # TODO
-  # Remove opencode
-  # Implement Ubuntu testbox
-  opencode:
-    image: ghcr.io/anomalyco/opencode:latest
-    container_name: opencode-cli
-    volumes:
-      - ./persist/workspace:/workspace
-      - ./persist/opencode-config/opencode.json:/root/.config/opencode/opencode.json
-      - ./persist/opencode-config/opencode.json:/root/.config/opencode/opencode.jsonc
-    stdin_open: true
-    tty: true
-    working_dir: /workspace
-    depends_on:
-      ollama:
-        condition: service_healthy
-    networks:
-      - ai-network
-
   gemini:
     image: us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox@sha256:8c7c10efd6fa25026767f75e27682beb831bd4270d8a04b88234c868973d41f3
     container_name: gemini-cli
@@ -53,8 +12,6 @@ services:
     env_file: .env
     working_dir: /app
 
-  # TODO add in makefile
-  # Add `build` subsection with context to build a cursor image
   testbox:
     image: ubuntu:latest
     container_name: testbox
@@ -65,6 +22,10 @@ services:
     working_dir: /workspace
     networks:
       - ai-network
+
+
+  # TODO
+  # Add cursor service, with `build` subsection
 
 networks:
   ai-network:
