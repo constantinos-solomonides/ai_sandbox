@@ -8,24 +8,25 @@ services:
       # Mounts your current project folder to /app inside the container
       - .:/app
       # Maps the local ./persist folder to the container's config directory
-      - ./persist:/root/.gemini
+      - ./persist/.gemini:/home/node/.gemini
+      - ./AI.md:/opt/ai_agent/AI.md
     env_file: .env
     working_dir: /app
 
   testbox:
-    image: ubuntu:latest
+    image: testbox
+    build:
+        context: ./configuration/testbox
     container_name: testbox
     volumes:
       - ./persist/workspace:/workspace
+      - ./AI.md:/opt/ai_agent/AI.md
     stdin_open: true
     tty: true
     working_dir: /workspace
+    env_file: .env
     networks:
       - ai-network
-
-
-  # TODO
-  # Add cursor service, with `build` subsection
 
 networks:
   ai-network:

@@ -93,9 +93,10 @@ EOF
     DEBIAN_FRONTEND=noninteractive apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     usermod -aG docker vagrant
   SHELL
-  config.vm.provision "file", source: "../sandbox", destination: "sandbox"
-  #
-  # TODO
-  # Add a synced shared folder so data can be easily communicated between the VM and the host system if needed
+  config.vm.synced_folder "../sandbox", "/opt/sandbox", type: "rsync",
+             rsync__args: ["--verbose", "--archive", "-z"],
+             rsync_exclude: [".*.swp", ".git*"]
 
 end
+  #
+  #
