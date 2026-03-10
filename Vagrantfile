@@ -92,10 +92,12 @@ EOF
     apt-get update
     DEBIAN_FRONTEND=noninteractive apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     usermod -aG docker vagrant
+    echo 'pushd /opt/sandbox || true' >> /home/vagrant/.bashrc
   SHELL
-  config.vm.synced_folder "../sandbox", "/opt/sandbox", type: "rsync",
+  # NOTE: When using below command, take care that the named parameters take TWO (2) underscores to work
+  config.vm.synced_folder "./", "/opt/sandbox", type: "rsync",
              rsync__args: ["--verbose", "--archive", "-z"],
-             rsync_exclude: [".*.swp", ".git*"]
+             rsync__exclude: [".*.swp", ".git*"]
 
 end
   #
