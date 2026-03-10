@@ -1,0 +1,8 @@
+FROM ubuntu:latest AS testbox
+RUN     apt update \
+    &&  DEBIAN_FRONTEND=non-interactive apt install -y \
+            curl    \
+    &&  rm -rf \
+            /var/lib/apt/* \
+            /var/cache/apt/archives/* \
+    && curl https://cursor.com/install -fsS | bash
