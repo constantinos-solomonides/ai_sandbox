@@ -5,4 +5,5 @@ RUN     apt update \
     &&  rm -rf \
             /var/lib/apt/* \
             /var/cache/apt/archives/* \
-    && curl https://cursor.com/install -fsS | bash
+    && curl https://cursor.com/install -fsS | bash \
+    && echo 'export PATH="/root/.local/bin:$PATH"' >> ~/.bashrc

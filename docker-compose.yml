@@ -17,6 +17,7 @@ services:
     image: testbox
     build:
         context: ./configuration/testbox
+        dockerfile: Dockerfile
     container_name: testbox
     volumes:
       - ./persist/workspace:/workspace
