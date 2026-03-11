@@ -22,6 +22,10 @@ services:
     volumes:
       - ./persist/workspace:/workspace
       - ./AI.md:/opt/ai_agent/AI.md
+      - ./persist/.cursor/auth.json:/root/.config/cursor/auth.json
+      - ./persist/.cursor/cli-config.json:/root/.cursor/cli-config.json
+      - ./persist/.cursor/.workspace-trusted:/root/.cursor/projects/workspace/.workspace-trusted
+      - ./persist/.cursor/ris.mdc:/workspace/.cursor/rules/ris.mdc
     stdin_open: true
     tty: true
     working_dir: /workspace

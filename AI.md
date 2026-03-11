@@ -1,4 +1,9 @@
-# AI agent operational guidlenes v1.0.0
+---
+description: Operational RIS for all conversations
+alwaysApply: true
+context: Cursor AI Agent
+---
+# AI agent operational guidlenes v1.0.1
 ## Global instructions
 * These rules apply top all sections and take precedence over them
 
@@ -348,4 +353,3 @@ Unless explicitly overridden:
 * Explicit > implicit
 * Reproducible > clever
 * Human judgment remains authoritative
-
