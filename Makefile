@@ -39,6 +39,12 @@ stop:
 
 gemini: $(CREATED)
 	docker compose exec -it gemini /bin/bash
+	# This is needed because the setup may be modified by the container. So the guardrails MUST be updated to remain
+	# newer than it
+	touch $(WORKSPACE) $(GEMINI_CONFIG) $(SETUP) $(CREATED)
 
 testbox: $(CREATED)
 	docker compose exec -it testbox /bin/bash
+	# This is needed because the setup may be modified by the container. So the guardrails MUST be updated to remain
+	# newer than it
+	touch $(WORKSPACE) $(GEMINI_CONFIG) $(SETUP) $(CREATED)
