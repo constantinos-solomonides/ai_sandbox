@@ -54,7 +54,7 @@ remains the selected way to deploy and access the containers
 | `make start`      | Starts the containers. Will call `up` if they don't exist                 |
 | `make stop`       | Stops the containers. Will not remove them.                               |
 | `make gemini`     | Executes and connects to a bash process inside the `gemini` container     |
-| `make testbox`    | Executes and connects to a bash process inside the `testbox` container    |
+| `make cursor`     | Executes and connects to a bash process inside the `cursor` container     |
 
 ### Notes
 * The `stop` and `down` rules do not have `start` and `up` as dependencies, otherwise they would start /

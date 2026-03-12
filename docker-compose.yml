@@ -13,12 +13,12 @@ services:
     env_file: .env
     working_dir: /app
 
-  testbox:
-    image: testbox
+  cursor:
+    image: cursor
     build:
-        context: ./configuration/testbox
+        context: ./configuration/cursor
         dockerfile: Dockerfile
-    container_name: testbox
+    container_name: cursor
     volumes:
       - ./persist/workspace:/workspace
       - ./AI.md:/opt/ai_agent/AI.md

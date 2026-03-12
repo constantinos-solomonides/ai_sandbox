@@ -47,8 +47,8 @@ gemini: $(CREATED)
 	# newer than it
 	touch $(WORKSPACE) $(GEMINI_CONFIG) $(SETUP_CURSOR) $(CREATED)
 
-testbox: $(CREATED) $(CURSOR_CONFIG)
-	docker compose exec -it testbox /bin/bash
+cursor: $(CREATED) $(CURSOR_CONFIG)
+	docker compose exec -it cursor /bin/bash
 	# This is needed because the setup may be modified by the container. So the guardrails MUST be updated to remain
 	# newer than it
 	touch $(WORKSPACE) $(GEMINI_CONFIG) $(SETUP_CURSOR) $(CREATED)
