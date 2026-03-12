@@ -1,4 +1,7 @@
 .*.swp
+persist
+configuration/persist
+notes*
 development-help/*/persist/*
 !development-help/*/persist/litellm
 development-help/*/persist/litellm/*

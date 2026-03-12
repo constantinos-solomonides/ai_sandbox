@@ -7,8 +7,8 @@ services:
     volumes:
       # Mounts your current project folder to /app inside the container
       - .:/app
-      # Maps the local ./persist folder to the container's config directory
-      - ./persist/.gemini:/home/node/.gemini
+      # Maps the local persistent configuration to the container's config directory
+      - ./configuration/persist/gemini:/home/node/.gemini
       - ./AI.md:/opt/ai_agent/AI.md
     env_file: .env
     working_dir: /app
@@ -22,9 +22,8 @@ services:
     volumes:
       - ./persist/workspace:/workspace
       - ./AI.md:/opt/ai_agent/AI.md
-      - ./persist/.cursor/auth.json:/root/.config/cursor/auth.json
-      - ./persist/.cursor/cli-config.json:/root/.cursor/cli-config.json
-      - ./persist/.cursor/.workspace-trusted:/root/.cursor/projects/workspace/.workspace-trusted
+      - ./configuration/persist/cursor/cursor/:/root/.cursor/
+      - ./configuration/persist/cursor/config:/root/.config/cursor/
       - ./persist/.cursor/ris.mdc:/workspace/.cursor/rules/ris.mdc
     stdin_open: true
     tty: true
