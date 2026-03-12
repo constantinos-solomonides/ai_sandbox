@@ -10,6 +10,7 @@ services:
       # Maps the local persistent configuration to the container's config directory
       - ./configuration/persist/gemini:/home/node/.gemini
       - ./AI.md:/opt/ai_agent/AI.md
+      - /opt/pytest-framework:/workspace/pytest-framework
     env_file: .env
     working_dir: /app
 
@@ -25,6 +26,7 @@ services:
       - ./configuration/persist/cursor/cursor/:/root/.cursor/
       - ./configuration/persist/cursor/config:/root/.config/cursor/
       - ./persist/.cursor/ris.mdc:/workspace/.cursor/rules/ris.mdc
+      - /opt/pytest-framework:/workspace/pytest-framework
     stdin_open: true
     tty: true
     working_dir: /workspace
