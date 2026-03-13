@@ -1,6 +1,8 @@
 .*.swp
-development-help/ai_vim_sandbox/persist/*
-!development-help/ai_vim_sandbox/persist/litellm
-development-help/ai_vim_sandbox/persist/litellm/*
-!development-help/ai_vim_sandbox/persist/litellm/config.yaml
-development-help/ai_vim_sandbox/.env
+persist
+configuration/persist
+configuration/gemini
+configuration/cursor
+!configuration/cursor/Dockerfile
+notes*
+**/.vagrant

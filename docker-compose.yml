@@ -1,0 +1,37 @@
+services:
+  gemini:
+    image: us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox@sha256:8c7c10efd6fa25026767f75e27682beb831bd4270d8a04b88234c868973d41f3
+    container_name: gemini-cli
+    stdin_open: true
+    tty: true
+    volumes:
+      # Mounts your current project folder to /app inside the container
+      - .:/app
+      # Maps the local persistent configuration to the container's config directory
+      - ./configuration/persist/gemini:/home/node/.gemini
+      - ./AI.md:/opt/ai_agent/AI.md
+    env_file: .env
+    working_dir: /app
+
+  cursor:
+    image: cursor
+    build:
+        context: ./configuration/cursor
+        dockerfile: Dockerfile
+    container_name: cursor
+    volumes:
+      - ./persist/workspace:/workspace
+      - ./AI.md:/opt/ai_agent/AI.md
+      - ./configuration/persist/cursor/cursor/:/root/.cursor/
+      - ./configuration/persist/cursor/config:/root/.config/cursor/
+      - ./persist/.cursor/ris.mdc:/workspace/.cursor/rules/ris.mdc
+    stdin_open: true
+    tty: true
+    working_dir: /workspace
+    env_file: .env
+    networks:
+      - ai-network
+
+networks:
+  ai-network:
+    driver: bridge
