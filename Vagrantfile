@@ -98,6 +98,9 @@ EOF
   config.vm.synced_folder "./", "/opt/sandbox", type: "rsync",
              rsync__args: ["--verbose", "--archive", "-z"],
              rsync__exclude: [".*.swp", ".git*"]
+  config.vm.synced_folder "../pytest-framework", "/opt/pytest-framework", type: "rsync",
+             rsync__args: ["--verbose", "--archive", "-z"],
+             rsync__exclude: [".*.swp", ".git*"]
 
 end
   #
