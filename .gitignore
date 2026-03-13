@@ -1,10 +1,8 @@
 .*.swp
 persist
 configuration/persist
+configuration/gemini
+configuration/cursor
+!configuration/cursor/Dockerfile
 notes*
-development-help/*/persist/*
-!development-help/*/persist/litellm
-development-help/*/persist/litellm/*
-!development-help/*/persist/litellm/config.yaml
-#development-help/*/.env
 **/.vagrant
