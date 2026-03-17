@@ -96,10 +96,11 @@ EOF
   SHELL
 
   config.vm.provision "shell", inline: <<-SHELL
-    sed -i -e '/^hardstatus/s/^/#/'
+    sed -i -e '/^hardstatus/s/^/#/' /etc/screenrc
+    sed -i -e '/color_prompt=yes/s/)/|screen)/' /home/vagrant/.bashrc /etc/skel/.bashrc
     cat >> /etc/screenrc <<EOF
     echo escape ^Oo
-    hardstatus alwayslastline "%n - %t"
+    hardstatus alwayslastline "%= %-Lw%{.bW}%n*%t%{-}%+Lw %="
     startup_message off
 EOF
   SHELL
