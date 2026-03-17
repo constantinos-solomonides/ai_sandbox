@@ -1,4 +1,7 @@
 *
+!**/README*.md
+!workspace/
+!workspace/**
 !**/AI.md
 !AI.md
 !GEMINI.md

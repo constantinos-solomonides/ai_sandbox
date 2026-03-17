@@ -94,6 +94,18 @@ EOF
     usermod -aG docker vagrant
     echo 'pushd /opt/sandbox || true' >> /home/vagrant/.bashrc
   SHELL
+
+  config.vm.provision "shell", inline: <<-SHELL
+    sed -i -e '/^hardstatus/s/^/#/'
+    cat >> /etc/screenrc <<EOF
+    echo escape ^Oo
+    hardstatus alwayslastline "%n - %t"
+    startup_message off
+EOF
+  SHELL
+
+
+
   # NOTE: When using below command, take care that the named parameters take TWO (2) underscores to work
   config.vm.synced_folder "./", "/opt/sandbox", type: "rsync",
              rsync__args: ["--verbose", "--archive", "-z"],
