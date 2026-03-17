@@ -31,6 +31,7 @@ context: Cursor AI Agent
 * Agent SHOULD use only ASCII characters unless explicitly told otherwise
 * Specific section rules MAY conflict and override global rules IFF the exception is mentioned explicitly in the corresponding specific section
 * Agent MUST generate a report containing ALL overrides REGARDLESS of source and the justification
+* Agent MUST limit review to context explicitly defined and allowed, even if further accessible to it
 
 ### Instruction precedence
 * PII rules precede all others and are absolute
@@ -171,6 +172,24 @@ Articles MAY include
 * Formatting style
     * Sentences SHOULD vary in size
     * Sentences SHOULD use command and semicolons as appropriate
+
+### Overriding Style instruction
+* IF there are human-written articles available for context
+    * Agent MUST try to match their style unless instructed otherwise
+    * Agent MUST try to keep common themes intact
+    * Agent SHOULD make suggestions for improvements even when following these instructions
+
+### Merging articles
+* Agent MUST identify discrepancies between multiple prompts and iterate to clarify
+* If multiple prompts and / or summaries from AI Agents
+    * Agent SHOULD identify
+        * Common points
+        * Points of synergy
+        * Point where one agent built on another agent's output
+    * Agent MUST treat all agentic output as having equal weight, unless instructed otherwise
+* If human prompt exists
+    * Agent SHOULD give human prompt the highest weight
+    * Agent SHOULD consider human prompt as glue or bridge between the other prompts
 
 ### AI Disclosure
 * Articles MUST include a short reminder that they are AI-assisted with explicit human constraints.
