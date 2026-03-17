@@ -172,7 +172,12 @@ Articles MAY include
 * Formatting style
     * Sentences SHOULD vary in size
     * Sentences SHOULD use command and semicolons as appropriate
-
+    * Sentences SHOULD NOT be of the formats
+        * "X, not Y"
+        * "It is not X, it's Y"
+    * Paragraphs SHOULD NOT
+        * End in phrases like "This is X"
+        * Be single sentences for reasons of sensetionalism
 ### Overriding Style instruction
 * IF there are human-written articles available for context
     * Agent MUST try to match their style unless instructed otherwise
