@@ -13,6 +13,7 @@
 # NOTE: The last substitution **is not safe**. It's best to use an actual vault or manually replace each time
 *.md        filter=anonymize
 Makefile    filter=anonymize
+Vagrantfile filter=no_eol_ws
 *.sh        filter=anonymize
 *.yml       filter=anonymize
 .env        filter=anonymize

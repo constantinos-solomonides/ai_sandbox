@@ -94,8 +94,26 @@ EOF
     usermod -aG docker vagrant
     echo 'pushd /opt/sandbox || true' >> /home/vagrant/.bashrc
   SHELL
-  # NOTE: When using below command, take care that the named parameters take TWO (2) underscores to work
+
+  config.vm.provision "shell", inline: <<-SHELL
+    sed -i -e '/^hardstatus/s/^/#/'
+    cat >> /etc/screenrc <<EOF
+    echo escape ^Oo
+    hardstatus alwayslastline "%n - %t"
+    startup_message off
+EOF
+  SHELL
+
+
+  ARTICLES_PATH = File.join(ENV['HOME'], "Documents/work/articles/wordpress/30_days_ai")
+  # NOTE: When using below commands, take care that the named parameters take TWO (2) underscores to work
   config.vm.synced_folder "./", "/opt/sandbox", type: "rsync",
+             rsync__args: ["--verbose", "--archive", "-z"],
+             rsync__exclude: [".*.swp", ".git*"]
+  config.vm.synced_folder "../pytest-framework", "/opt/pytest-framework", type: "rsync",
+             rsync__args: ["--verbose", "--archive", "-z"],
+             rsync__exclude: [".*.swp", ".git*"]
+  config.vm.synced_folder ARTICLES_PATH, "/opt/articles", type: "rsync",
              rsync__args: ["--verbose", "--archive", "-z"],
              rsync__exclude: [".*.swp", ".git*"]
 
