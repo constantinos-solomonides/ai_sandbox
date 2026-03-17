@@ -105,12 +105,15 @@ EOF
   SHELL
 
 
-
-  # NOTE: When using below command, take care that the named parameters take TWO (2) underscores to work
+  ARTICLES_PATH = File.join(ENV['HOME'], "Documents/work/articles/wordpress/30_days_ai")
+  # NOTE: When using below commands, take care that the named parameters take TWO (2) underscores to work
   config.vm.synced_folder "./", "/opt/sandbox", type: "rsync",
              rsync__args: ["--verbose", "--archive", "-z"],
              rsync__exclude: [".*.swp", ".git*"]
   config.vm.synced_folder "../pytest-framework", "/opt/pytest-framework", type: "rsync",
+             rsync__args: ["--verbose", "--archive", "-z"],
+             rsync__exclude: [".*.swp", ".git*"]
+  config.vm.synced_folder ARTICLES_PATH, "/opt/articles", type: "rsync",
              rsync__args: ["--verbose", "--archive", "-z"],
              rsync__exclude: [".*.swp", ".git*"]
 
