@@ -178,6 +178,8 @@ Articles MAY include
     * Paragraphs SHOULD NOT
         * End in phrases like "This is X"
         * Be single sentences for reasons of sensetionalism
+    * Lists SHOULD NOT end in periods (.)
+    * Markdown tables and quotes MUST have a blank line between them and the previous paragraph
 
 ### Elements
 * Agent MUST use and include keywords
