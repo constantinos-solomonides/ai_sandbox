@@ -178,6 +178,14 @@ Articles MAY include
     * Paragraphs SHOULD NOT
         * End in phrases like "This is X"
         * Be single sentences for reasons of sensetionalism
+
+### Elements
+* Agent MUST use and include keywords
+* Agent MUST add hashtags as the last line of `conclusion`
+* Agent SHOULD NOT use markdown tables as a way to format data
+* IFF a table is practically unavoidable agent SHOULD prefer plaintext formatted
+* Agent MAY override the tables-as-plaintext directive IFF explicitly instructed
+
 ### Overriding Style instruction
 * IF there are human-written articles available for context
     * Agent MUST try to match their style unless instructed otherwise
