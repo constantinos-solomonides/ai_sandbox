@@ -5,6 +5,7 @@
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
+
 Vagrant.configure("2") do |config|
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
@@ -18,13 +19,22 @@ Vagrant.configure("2") do |config|
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
-  # config.vm.box_check_update = false
+  config.vm.box_check_update = false
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   # NOTE: This will enable public access to the opened port
-  config.vm.network "forwarded_port", guest: 11434, host: 11434
+
+  fw_ports = ENV["VAGRANT_PORTS"]
+  if fw_ports and fw_ports.length > 0 then
+    fw_ports.split(',').each do |portnr|
+        config.vm.network "forwarded_port",
+          guest: portnr.to_i,
+          host: portnr.to_i,
+          auto_correct: true
+    end
+  end
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine and only allow access
@@ -105,6 +115,7 @@ EOF
   SHELL
 
 
+
   ARTICLES_PATH = File.join(ENV['HOME'], "Documents/work/articles/wordpress/30_days_ai")
   # NOTE: When using below commands, take care that the named parameters take TWO (2) underscores to work
   config.vm.synced_folder "./", "/opt/sandbox", type: "rsync",
@@ -116,7 +127,4 @@ EOF
   config.vm.synced_folder ARTICLES_PATH, "/opt/articles", type: "rsync",
              rsync__args: ["--verbose", "--archive", "-z"],
              rsync__exclude: [".*.swp", ".git*"]
-
 end
-  #
-  #
