@@ -1,8 +1,10 @@
 .*.swp
 persist
+workspace
 configuration/persist
 configuration/gemini
 configuration/cursor
 !configuration/cursor/Dockerfile
 notes*
 **/.vagrant
+
