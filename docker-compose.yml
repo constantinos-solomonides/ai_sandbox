@@ -9,6 +9,7 @@ services:
       - .:/app
       # Maps the local persistent configuration to the container's config directory
       - ./configuration/persist/gemini:/home/node/.gemini
+      - ./persist/workspace:/app/workspace
       - ./AI.md:/opt/ai_agent/AI.md
       - /opt/pytest-framework:/app/workspace/pytest-framework
       - /opt/articles:/app/workspace/articles
