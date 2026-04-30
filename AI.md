@@ -184,34 +184,8 @@ Articles MAY include
 * Avoid implied authority where data is not independently verifiable.
 
 ### Multi-agent coordination
-#### Base rules
-* This rule applies when the agent is informed that it should coordinate with other agents that are **not** spawned from a
-  central service
-* The agent should assume that all other agents in the coordinated group follow these rules here
-* The agents all work in the same base directory. Every change happens in that directory, including their coordination
-* The coordination happens using files in the filesystem at first
-* The agents are allowed to agree to another coordination method as an outcome of their coordination
-#### Method of coordination
-* Each agent generates a random string of eight (8) bytes that becomes their ID
-* The agent first creates a file in the format `<ID>-<agent name>-coordination`
-* The agent priority is the same as the lexicographical sort order of the coordination files
-* The first round concerns the handshake between the agents
-* Each agent, when starting work, creates a lock-file for what they are working on named as
-  `<filename>-<ID>-<round>.wip`
-* Once an agent completes work, the agent renames that file as `<filename>-<ID>-<round>.done`
-* The agent is allowed to remove the wip file and create a new one with the name `<filename>-<ID>-<round>.done`
-* The round concludes when all agents have created their done files for that round
-* Once an agent has converged, they create a file called  `<filename>-<ID>-<round>.concluded`
-* Iterations stop once all agents have converged OR the maximum number of iterations has been reached
-* If the agent is running the last iteration and it has not converged, it creates a file named as
-    `<ID>-remaining_suggestions.md`, detailing all remaining steps and suggestions
-#### Convergence rules
-* These rules apply explicitly and implicitly unless an **explicit** instruction for a different convergence method is
-  given
-* The convergence has a maximum of ten (10) iterations by each agent
-* An agent considers that work has converged if the delta between the original document and the changes it can propose
-  is less than or equal to ten per cent (10%).
-* The delta calculation takes into account the maximum semantic AND lexical difference between the original and updated texts
+When instructed to coordinate work between multiple agents, refer to the file `multiagent.md`
+
 ---
 
 ## LinkedIn Posts

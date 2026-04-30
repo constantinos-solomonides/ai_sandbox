@@ -5,8 +5,8 @@ services:
     stdin_open: true
     tty: true
     volumes:
-      # Mounts your current project folder to /app inside the container
-      - .:/app
+      - ./AI.md:/app/AI.md
+      - ./multiagent.md:/app/multiagent.md
       # Maps the local persistent configuration to the container's config directory
       - ./configuration/persist/gemini:/home/node/.gemini
       - ./persist/workspace:/app/workspace
@@ -15,6 +15,8 @@ services:
       - /opt/articles:/app/workspace/articles
     env_file: .env
     working_dir: /app
+    networks:
+      - ai-network
 
   cursor:
     image: cursor
@@ -23,17 +25,17 @@ services:
         dockerfile: Dockerfile
     container_name: cursor
     volumes:
-      - ./persist/workspace:/workspace
+      - ./persist/workspace:/app/workspace
       - ./AI.md:/opt/ai_agent/AI.md
       - ./configuration/persist/cursor/cursor/:/root/.cursor/
       - ./configuration/persist/cursor/config:/root/.config/cursor/
-      - ./persist/.cursor/ris.mdc:/workspace/.cursor/rules/ris.mdc
-      - /opt/pytest-framework:/workspace/pytest-framework
-      - /opt/articles:/workspace/articles
+      - ./persist/.cursor/ris.mdc:/app/workspace/.cursor/rules/ris.mdc
+      - /opt/pytest-framework:/app/workspace/pytest-framework
+      - /opt/articles:/app/workspace/articles
     stdin_open: true
     tty: true
-    working_dir: /workspace
     env_file: .env
+    working_dir: /app
     networks:
       - ai-network
 
