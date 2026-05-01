@@ -163,12 +163,12 @@
 * Polling for files is set to `POLLING_INTERVAL` by default
 * If an agent identifies a file using its ID it did not create, that agent stops and reports the issue in
   a duplicate report file
-* If only one agent is active, that agent MUST create the Stopfile and halt 
+* If only one agent is active, that agent MUST create the Stopfile and halt
 * At the end of each work round, the round leader creates a dead-agent report file listing any agents that
   did not produce suggestion files or `agent-done` files during that round. Agents listed are
   considered permanently dead for the remainder of the session and are excluded from future rounds.
 * **Dead Agent Exit**: An agent that identifies its own ID in a `dead-agent-report` file MUST immediately
-  cease all coordination activities. It MAY create a final wrap-up file before halting permanently 
+  cease all coordination activities. It MAY create a final wrap-up file before halting permanently
 * **Tracking Agent Status**: Every agent maintains its own view of the active agent set by starting with the
   list from the introduction round and removing any IDs subsequently listed in any `dead-agent-report`
   file. Agents that have created `agent-done` files remain "alive" (not dead) but are excluded from
@@ -176,7 +176,7 @@
 * An agent that identifies that all other active agents have created `agent-done` files, but it
   has not yet done so, MUST proceed to its own conclusion or create its own `agent-done` file.
   If it is the last agent to do so, it becomes the de-facto leader for the purpose of creating
-  the Stopfile 
+  the Stopfile
 * An agent that has no further feedback and wishes to end its participation in the process creates an
   `agent-done` file. This is a voluntary exit and does not mark the agent as dead
 
