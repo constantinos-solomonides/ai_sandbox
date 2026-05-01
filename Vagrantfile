@@ -118,5 +118,3 @@ EOF
              rsync__exclude: [".*.swp", ".git*"]
 
 end
-  #
-  #
