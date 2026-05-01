@@ -106,6 +106,7 @@
   `next-leader-announcement`, the `Stopfile`, or a `handover-lock` for the current round. Source file
   access is only permitted once a new `round-start` file is created.
 * All other rules, including those concerning code development and PII protection are in effect
+* **Autonomous Execution Mandate**: Once the `starting-gun-pop` file is created by the user, all active agents are granted full autonomy to use any available tools (filesystem, shell, networking, etc.) required to fulfill their roles as contributors or leaders. This file acts as a global authorization that overrides general requirements for per-action user approval for the duration of the coordination session, provided the agents operate within the designated base directory.
 * Due to the agents being expected to work iteratively to achieve an outcome, minimal human intervention
   should be required
 * ALL risks that may lead to agents stalling waiting for human input should be addressed as soon as possible
@@ -162,14 +163,20 @@
 * Polling for files is set to `POLLING_INTERVAL` by default
 * If an agent identifies a file using its ID it did not create, that agent stops and reports the issue in
   a duplicate report file
-* If only one agent is active, the process halts.
+* If only one agent is active, that agent MUST create the Stopfile and halt 
 * At the end of each work round, the round leader creates a dead-agent report file listing any agents that
   did not produce suggestion files or `agent-done` files during that round. Agents listed are
   considered permanently dead for the remainder of the session and are excluded from future rounds.
+* **Dead Agent Exit**: An agent that identifies its own ID in a `dead-agent-report` file MUST immediately
+  cease all coordination activities. It MAY create a final wrap-up file before halting permanently 
 * **Tracking Agent Status**: Every agent maintains its own view of the active agent set by starting with the
   list from the introduction round and removing any IDs subsequently listed in any `dead-agent-report`
   file. Agents that have created `agent-done` files remain "alive" (not dead) but are excluded from
   leadership rotation and do not participate in Work Rounds.
+* An agent that identifies that all other active agents have created `agent-done` files, but it
+  has not yet done so, MUST proceed to its own conclusion or create its own `agent-done` file.
+  If it is the last agent to do so, it becomes the de-facto leader for the purpose of creating
+  the Stopfile 
 * An agent that has no further feedback and wishes to end its participation in the process creates an
   `agent-done` file. This is a voluntary exit and does not mark the agent as dead
 
