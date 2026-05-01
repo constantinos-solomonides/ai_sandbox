@@ -45,8 +45,10 @@
   `WORK_ROUND_HARD_CAP`. The active phase starts at the moment the round-start file is created. The
   duration for the round is known at round start (announced by the leader in the round-start file)
 * Any agent may request a time extension by creating a time-extension request file during the previous
-  round or before the round starts. The leader sets the active phase duration to the maximum requested
-  time (capped at `WORK_ROUND_HARD_CAP`). If no extensions are requested, `WORK_ROUND_SOFT_CAP` is used
+  round or before the round starts. For Work Round 1, time-extension requests may be submitted
+  during the preceding coordination round. The leader sets the active phase duration to the
+  maximum requested time (capped at `WORK_ROUND_HARD_CAP`). If no extensions are requested,
+  `WORK_ROUND_SOFT_CAP` is used
 * The aggregation phase begins at the end of the active phase and can last up to `AGGREGATION_TIME_FACTOR`
   times the active phase duration
 * The wait for the `starting-gun-pop` file to appear has a maximum duration equal to `WORK_ROUND_HARD_CAP`
@@ -91,10 +93,18 @@
   avoid conflicts with existing project directories
 * The agents are allowed to agree to another coordination method as an outcome of their coordination
 * An agent's special files can **only** be modified by that agent, including updating access and
-  modification times
+  modification times.
+* **Internal ID Verification**: Every special file (suggestions, proposals, reports) MUST contain the
+  creating agent's ID as the first line of the file. A round leader or aggregator MUST verify that the
+  internal ID matches the `<ID>` portion of the filename. If they do not match, the file is ignored
+  and the discrepancy is reported in an error report.
 * An agent tracks the state of the special files that belong to it. If any of its files are modified by
   an entity other than the agent itself, the agent reports this as an issue in its error report file
-  and halts
+  and halts.
+* **Read Quiescence during Aggregation**: During the aggregation phase, non-leader agents MUST NOT
+  read or analyze source files in the base directory. They must only poll for the
+  `next-leader-announcement`, the `Stopfile`, or a `handover-lock` for the current round. Source file
+  access is only permitted once a new `round-start` file is created.
 * All other rules, including those concerning code development and PII protection are in effect
 * Due to the agents being expected to work iteratively to achieve an outcome, minimal human intervention
   should be required
@@ -152,9 +162,14 @@
 * Polling for files is set to `POLLING_INTERVAL` by default
 * If an agent identifies a file using its ID it did not create, that agent stops and reports the issue in
   a duplicate report file
-* If only one agent is active, the process halts
+* If only one agent is active, the process halts.
 * At the end of each work round, the round leader creates a dead-agent report file listing any agents that
-  did not produce suggestion files during that round. Agents listed are excluded from future rounds
+  did not produce suggestion files or `agent-done` files during that round. Agents listed are
+  considered permanently dead for the remainder of the session and are excluded from future rounds.
+* **Tracking Agent Status**: Every agent maintains its own view of the active agent set by starting with the
+  list from the introduction round and removing any IDs subsequently listed in any `dead-agent-report`
+  file. Agents that have created `agent-done` files remain "alive" (not dead) but are excluded from
+  leadership rotation and do not participate in Work Rounds.
 * An agent that has no further feedback and wishes to end its participation in the process creates an
   `agent-done` file. This is a voluntary exit and does not mark the agent as dead
 
@@ -194,17 +209,22 @@
 * If the `starting-gun-pop` file does not appear within `WORK_ROUND_HARD_CAP`, the execution terminates
   without any further action
 * Once the `starting-gun-pop` file appears, each agent reads all work-application files to identify the
-  full set of active agent IDs
+  full set of active agent IDs. If more than `MAX_AGENTS` work-application files exist, the group
+  may proceed with the expanded set to test the limits of the coordination protocol. The first round
+  leader (lexicographically lowest ID) immediately initiates the first coordination round by creating
+  the corresponding round-start file.
 
 ### Coordination rounds
 
 * Coordination rounds refer to rounds where work is assigned or ways to coordinate are defined by agents
-* Coordination rounds **must** follow the last introduction round in an introduction round set
-* A **set** of coordination rounds occurs between work rounds when `COORDINATION_TRIGGER_RATIO` of the
+* Coordination rounds **must** follow the last introduction round in an introduction round set.
+* A **set** of coordination rounds consists of one or more coordination rounds. The set ends
+  when a coordination result is achieved or the coordination process converges on a method.
+* A coordination set occurs between work rounds when `COORDINATION_TRIGGER_RATIO` of the
   agents that were active at the start of work after the previous coordination set are no longer active,
-  **and** more than `COORDINATION_MIN_AGENTS` agents are still active
+  **and** more than `COORDINATION_MIN_AGENTS` agents are still active.
 * For the first coordination set, the active agent count is defined as the number of agents that created
-  work application files before the `starting-gun-pop` file appeared
+  work application files before the `starting-gun-pop` file appeared.
 * Coordination rounds are **not** counted towards iteration caps
 * A coordination round has a leader, selected using the same rules as work round leaders
 * A coordination round begins when its leader creates a round-start file and has a hard time cap of
@@ -292,7 +312,12 @@
 
 * During the active phase, **all** agents (including the round leader) read the files that still need
   work and create suggestion files
-* An agent is free to create its suggestion files at any point during the active phase
+* An agent is free to create its suggestion files at any point during the active phase. To ensure
+  atomicity, an agent MUST write the suggestion to a temporary file and then move it to the final
+  `suggestion-<filehash>-<round_number>-<ID>` filename.
+* The preferred format for suggestion files is the **Unified Diff** format. If an agent cannot
+  produce a diff, it may provide the full updated content of the file. The round leader must
+  support both formats.
 * Each suggestion file must include the agent's current system time at the end of the file in the
   format `file created at <ISO 8601 timestamp>`
 * Only suggestion files with a filesystem creation time between round start and round end (end of active
@@ -308,17 +333,24 @@
 #### Aggregation phase
 
 * Aggregation begins at the end of the active phase and can last up to `AGGREGATION_TIME_FACTOR` times
-  the active phase duration
-* The round leader reads all valid suggestion files from active agents (including its own)
-* The round leader decides which suggestions to apply, considering the aggregate input. Differences in
-  quality and priority across suggestions are considered a feature of this approach
-* The round leader applies the selected changes to the target files
-* The round leader commits all modifications with a message detailing the round number and changes applied
+  the active phase duration.
+* The round leader reads all valid suggestion files from active agents (including its own).
+* **Conflict Resolution Strategy**:
+    * **Non-Overlapping Priority**: The leader MUST apply all non-overlapping suggestions (changes to different files or different lines) that are semantically consistent.
+    * **Backward Compatibility Priority**: In all cases, the leader MUST prioritize suggestions that preserve backward compatibility (API stability, existing behavior).
+    * **Consensus-Based Resolution**: If suggestions conflict on the same lines, the leader favors the one supported by the most agents.
+    * **Discretionary Synthesis**: If no consensus exists, the leader may synthesize a solution that merges the intents of conflicting suggestions, provided it remains semantically sound.
+* **Reporting Breaking Changes**: If the leader accepts a suggestion that breaks backward compatibility or rejects a valid suggestion due to an irreconcilable conflict, it MUST record this in the commit message or a dedicated `aggregation-report-<round_number>-<leader_ID>.md` file.
+* The round leader applies the selected changes to the target files and commits them with a structured message detailing the round number and agent ID.
 * After committing, the round leader:
     * Creates a dead-agent report file if any agents failed to produce valid suggestion files
-    * Creates a next-leader announcement file designating the leader for the following round
-    * The next leader is selected from agents that are alive and have not created an opt-out file,
-      in lexicographic order after the current leader's ID (wrapping around if necessary)
+    * Creates a next-leader announcement file designating the leader for the following round.
+      The next leader is selected from agents that are alive and have not created an opt-out file
+      or an `agent-done` file, in lexicographic order after the current leader's ID (wrapping
+      around if necessary)
+    * If no agents are eligible to be the next leader (all alive agents have created `agent-done`
+      files or opt-out files, or are at risk), the round leader creates the Stopfile to terminate
+      the coordination process.
 
 #### Timing and clock reference
 
@@ -338,10 +370,25 @@
     1. Wait an additional `POLLING_INTERVAL` after the aggregation deadline (grace period)
     2. Check `git log` to determine if the original leader committed during the aggregation phase
     3. If a commit by the original leader exists, handover is cancelled — the round completed normally
-    4. If no such commit exists, the acting leader performs `git reset --hard HEAD` to discard any
-       partial changes, then performs aggregation from scratch using all valid suggestion files
+    4. If no such commit exists, the acting leader attempts to claim the handover by creating an
+       atomic directory named `handover-lock-<round_number>-<acting_leader_ID>` in the `COORDINATION_DIR`.
+    5. If multiple agents attempt handover, the one that successfully creates its directory first
+       (lexicographically lowest ID among those who succeeded in `mkdir`) wins the lock. Any agent
+       that fails to create its directory or sees a directory from an agent with a lower ID must yield.
+    6. The winning acting leader performs `git reset --hard HEAD` to discard any partial changes,
+       then performs aggregation from scratch using all valid suggestion files.
 * The acting leader that took over aggregation also designates the next round's leader (which may be
   itself or another eligible agent)
+
+#### Late leader yield
+
+* A round leader that has not landed its commit by the aggregation deadline MUST immediately cease
+  aggregation and check for the existence of `handover-lock` directories for the current round
+* If any `handover-lock` directory exists, or if the grace period after the deadline has expired,
+  the original leader MUST yield, discard its uncommitted changes (`git reset --hard HEAD`), and
+  revert to follower status. It then polls for the next-leader announcement from the acting leader.
+* This ensures that a slow leader does not conflict with an acting leader that has successfully
+  claimed the handover.
 
 ### Definition of round leader
 
@@ -433,6 +480,7 @@
   candidate set and worst-rank is computed only over agents listing each method. A method listed by
   fewer agents could win due to having a lower worst-rank. This is deterministic but may produce
   unintuitive outcomes
-* **Exceeding `MAX_AGENTS`**: If more than `MAX_AGENTS` agents create work-application files before
-  the `starting-gun-pop` file, no rule defines whether excess agents are excluded, the process halts,
-  or user intervention is required
+* **Exceeding `MAX_AGENTS`**: While the protocol is designed for up to `MAX_AGENTS` agents, it is unlikely
+  that this number will be exceeded in normal operation. If it is, the process serves as a test
+  of the protocol's scaling limits rather than a standard work session. Performance may degrade due
+  to I/O contention and polling noise.
