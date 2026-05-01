@@ -217,6 +217,9 @@ Articles MAY include
   * declare when AI-assisted estimation is used
 * Avoid implied authority where data is not independently verifiable.
 
+### Multi-agent coordination
+When instructed to coordinate work between multiple agents, refer to the file `multiagent.md`
+
 ---
 
 ## LinkedIn Posts

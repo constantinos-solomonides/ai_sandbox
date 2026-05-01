@@ -41,13 +41,13 @@ stop:
 	docker compose stop
 	rm -f $(STARTED)
 
-gemini: $(CREATED)
+gemini: $(STARTED)
 	docker compose exec -it gemini /bin/bash
 	# This is needed because the setup may be modified by the container. So the guardrails MUST be updated to remain
 	# newer than it
 	touch $(WORKSPACE) $(GEMINI_CONFIG) $(SETUP_CURSOR) $(CREATED)
 
-cursor: $(CREATED) $(CURSOR_CONFIG)
+cursor: $(STARTED) $(CURSOR_CONFIG)
 	docker compose exec -it cursor /bin/bash
 	# This is needed because the setup may be modified by the container. So the guardrails MUST be updated to remain
 	# newer than it
