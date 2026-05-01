@@ -62,9 +62,9 @@
 * All special files are placed in the `COORDINATION_DIR` directory
 * All special files are named using *only* ASCII printable characters
 * Round types are indicated in filenames using the following prefixes:
-    * `intro` — introduction rounds
-    * `coord` — coordination rounds
-    * `work` — work rounds
+    * `intro` - introduction rounds
+    * `coord` - coordination rounds
+    * `work` - work rounds
 
 | File type | Name pattern | Notes |
 |-----------|--------------|-------|
@@ -138,7 +138,7 @@
   method is given
 * The default maximum number of iterations is `ITERATION_SOFT_CAP`. Agents may autonomously decide to
   extend beyond this up to `ITERATION_HARD_CAP` based on observed progress, number of files, or file
-  sizes — no user confirmation is required for this extension
+  sizes - no user confirmation is required for this extension
 * Extending past `ITERATION_HARD_CAP` requires explicit user confirmation. If user confirmation is not
   available, the process halts. The user may then start a new coordination session with an expanded
   `ITERATION_HARD_CAP`, potentially with different agents or agent IDs. The user is allowed to delete
@@ -357,7 +357,7 @@
 * All timing within a round is derived from the **filesystem modification timestamp (mtime)** of the
   round-start file. This serves as the single shared clock reference for all agents
 * Active phase ends at: round-start file mtime + active phase duration (as announced in the file)
-* Aggregation deadline: active phase end + (active phase duration × `AGGREGATION_TIME_FACTOR`)
+* Aggregation deadline: active phase end + (active phase duration * `AGGREGATION_TIME_FACTOR`)
 * Agents compare "current time" against these derived deadlines to determine phase transitions
 
 #### Leader failure and handover during aggregation
@@ -369,7 +369,7 @@
   agent initiates handover using the following protocol:
     1. Wait an additional `POLLING_INTERVAL` after the aggregation deadline (grace period)
     2. Check `git log` to determine if the original leader committed during the aggregation phase
-    3. If a commit by the original leader exists, handover is cancelled — the round completed normally
+    3. If a commit by the original leader exists, handover is cancelled - the round completed normally
     4. If no such commit exists, the acting leader attempts to claim the handover by creating an
        atomic directory named `handover-lock-<round_number>-<acting_leader_ID>` in the `COORDINATION_DIR`.
     5. If multiple agents attempt handover, the one that successfully creates its directory first
